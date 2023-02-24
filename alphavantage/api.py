@@ -4,7 +4,6 @@ import json
 BASE_URL = 'https://www.alphavantage.co'
 API_KEY = 'XPUQE7JEOASO8B6T'
 
-
 def format(data):
     symbol = data['Meta Data']['2. Symbol']
     formatted_data = []
@@ -24,7 +23,14 @@ def get_daily_adjusted(symbol):
     # TODO: handle error
     function = 'TIME_SERIES_DAILY_ADJUSTED'
     url = f'{BASE_URL}/query?function={function}&symbol={symbol}&apikey={API_KEY}'
-    r = requests.get(url)
-    data = r.json()
-    data = format(data)
-    return data
+    try:
+        r = requests.get(url)
+        r.raise_for_status() # Raise an HTTPError if status is 4xx or 5xx
+        data = r.json()
+        data = format(data)
+        data = data[:10]
+        return data
+    except requests.exceptions.RequestException as e:
+        print("An error occurred: ", e)
+        return []
+
