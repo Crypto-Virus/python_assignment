@@ -23,6 +23,7 @@ def get_db():
     finally:
         db.close()
 
+@app.get('/api/financial_data')
 @app.get('/api/financial_data/')
 def get_financial_data(
     limit: int = 5,
@@ -50,6 +51,7 @@ def get_financial_data(
         }
     }
 
+@app.get('/api/statistics')
 @app.get('/api/statistics/')
 def get_statistics(
     symbol: str,
