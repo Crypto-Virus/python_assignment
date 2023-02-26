@@ -6,9 +6,12 @@ API_KEY = os.environ.get('API_KEY')
 BASE_URL = 'https://www.alphavantage.co'
 
 def format(data):
+    """
+    Format results returned alphavantage api endpoint
+    """
     symbol = data['Meta Data']['2. Symbol']
     formatted_data = []
-    for k, v in data['Time Series (Daily)'].items():
+    for k, v in data['Time Series (Daily)'].items()[:10]:
         entry = {
             'symbol': symbol,
             'date': k,
@@ -19,7 +22,16 @@ def format(data):
         formatted_data.append(entry)
     return formatted_data
 
-def get_daily_adjusted(symbol):
+def get_stock_daily(symbol: str):
+    """
+    Get last 10 days (approx. 2 weeks) daily open, close, volume values for specified stock
+
+    Parameters:
+        symbol (str): The symbol of the stock to fetch data for
+
+    Returns:
+        List representing last 10 days of stock data
+    """
     # TODO: validate symbol
     # TODO: handle error
     function = 'TIME_SERIES_DAILY_ADJUSTED'
@@ -29,7 +41,6 @@ def get_daily_adjusted(symbol):
         r.raise_for_status() # Raise an HTTPError if status is 4xx or 5xx
         data = r.json()
         data = format(data)
-        data = data[:10]
         return data
     except requests.exceptions.RequestException as e:
         print("An error occurred: ", e)

@@ -3,12 +3,9 @@ from datetime import date
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-import requests
-import json
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
-import alphavantage.api
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -25,6 +22,7 @@ def get_db():
 @app.get('/api/financial_data')
 @app.get('/api/financial_data/')
 def get_financial_data(
+
     limit: int = 5,
     page: int = 1,
     symbol: Union[str, None] = None,
@@ -32,7 +30,19 @@ def get_financial_data(
     end_date: Union[date, None] = None,
     db: Session = Depends(get_db),
 ):
-    # TODO: validate
+    """
+    This function creates API endpoint to fetch financial data from database
+
+    Args:
+    - limit (int, optional): Number of items returned per page.
+    - page (int, optional): Page to return data for.
+    - symbol (str, optional): Symbol representing stock to return stock data for
+    - start_date (date, optional): Filter to return data after start_date
+    - end_date (date, optional): Filter to return data before end_date
+
+    Returns:
+    - Dict containing stock data, pagination info, and optional error
+    """
     skip = (page - 1) * limit
     count = crud.get_financial_data_count(db)
     data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
@@ -58,9 +68,21 @@ def get_statistics(
     end_date: date,
     db: Session = Depends(get_db),
 ):
-    # TODO: validate
+    """
+    This funciton creates API endpoint to fetch statistics of particular stock
+
+    Args:
+    - symbol (str): Symbol representing stock to calculate statistics for
+    - start_date (date): Filter to filter data lower than start_date to calculate statistics
+    - end_date (date): Filter to filter data higher than end_date to calculate statistics
+
+    Returns:
+    - Dict containing start_date, end_date, symbol,
+        average_daily_open_price, average_daily_close_price,
+        and average_daily_volume
+    """
+    # BUG: get_financial_data has a limit!
     data = crud.get_financial_data(db, symbol, start_date, end_date)
-    print(data)
     average_daily_open_price = sum([entry.open_price for entry in data]) / len(data)
     average_daily_close_price = sum([entry.close_price for entry in data]) / len(data)
     average_daily_volume = sum([entry.volume for entry in data]) / len(data)
