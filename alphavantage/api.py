@@ -1,8 +1,9 @@
+import os
 import requests
-import json
 
+
+API_KEY = os.environ.get('API_KEY')
 BASE_URL = 'https://www.alphavantage.co'
-API_KEY = 'XPUQE7JEOASO8B6T'
 
 def format(data):
     symbol = data['Meta Data']['2. Symbol']

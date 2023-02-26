@@ -13,7 +13,6 @@ import alphavantage.api
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-API_KEY = "XPUQE7JEOASO8B6T"
 
 # Dependency
 def get_db():
