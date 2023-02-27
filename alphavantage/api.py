@@ -48,9 +48,7 @@ def get_stock_daily(symbol: str):
     function = 'TIME_SERIES_DAILY_ADJUSTED'
     url = f'{BASE_URL}/query?function={function}&symbol={symbol}&apikey={API_KEY}'
     try:
-        print('making request', url)
         r = requests.get(url)
-        print('finished request')
         r.raise_for_status() # Raise an HTTPError if status is 4xx or 5xx
         data = r.json()
         data = format(data)
