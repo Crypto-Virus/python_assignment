@@ -107,7 +107,6 @@ def get_statistics(
     average_daily_open_price = sum([entry.open_price for entry in data]) / len(data)
     average_daily_close_price = sum([entry.close_price for entry in data]) / len(data)
     average_daily_volume = sum([entry.volume for entry in data]) / len(data)
-    print('b')
     return {
         'data': {
             "start_date": start_date,
