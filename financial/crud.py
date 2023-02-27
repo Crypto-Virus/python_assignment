@@ -38,8 +38,11 @@ def get_financial_data(
     - symbol (str, optional): Stock symbol to fetch data for
     - start_date (date, optional): Filter to filter out data before start_date
     - end_date (date, optional): Filter to filter out data after end_date
-    - skip (int, optional): number of rows to skip. Defaults to 0.
-    - limit (int, optional): number of rows to return. Defaults to 5.
+    - skip (int, optional): number of rows to skip. Defaults to 0
+    - limit (int, optional): number of rows to return. Defaults to 5
+
+    Returns:
+    - list of stock data entries
     """
     query = db.query(models.Entry)
     if symbol is not None:
@@ -58,5 +61,8 @@ def get_financial_data_count(db: Session):
 
     Args:
     - db (Session): Sqlalcheny session object
+
+    Returns:
+    - integer representing count of rows in financial_data table
     """
     return db.query(models.Entry).count()

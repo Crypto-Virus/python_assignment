@@ -1,8 +1,11 @@
+import json
 from typing import List, Union
 from datetime import date
 
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -44,21 +47,27 @@ def get_financial_data(
     - Dict containing stock data, pagination info, and optional error
     """
     skip = (page - 1) * limit
-    count = crud.get_financial_data_count(db)
-    data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
-    error_msg = ''
-    return {
-        'data': data,
-        'pagination': {
-            'count': count,
-            'page': page,
-            'limit': limit,
-            'pages': int(count / limit)
-        },
-        'info': {
-            'error': error_msg,
+    try:
+        count = crud.get_financial_data_count(db)
+        data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f'Failed to get data from database. Error [{e}]',
+        )
+    else:
+        return {
+            'data': data,
+            'pagination': {
+                'count': count,
+                'page': page,
+                'limit': limit,
+                'pages': int(count / limit)
+            },
+            'info': {
+                'error': '',
+            }
         }
-    }
 
 @app.get('/api/statistics')
 @app.get('/api/statistics/')
@@ -82,11 +91,16 @@ def get_statistics(
         and average_daily_volume
     """
     # BUG: get_financial_data has a limit!
-    data = crud.get_financial_data(db, symbol, start_date, end_date)
+    try:
+        data = crud.get_financial_data(db, symbol, start_date, end_date)
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f'Failed to get data from database. Error [{e}]',
+        )
     average_daily_open_price = sum([entry.open_price for entry in data]) / len(data)
     average_daily_close_price = sum([entry.close_price for entry in data]) / len(data)
     average_daily_volume = sum([entry.volume for entry in data]) / len(data)
-    error_msg = ''
     return {
         'data': {
             "start_date": start_date,
@@ -97,7 +111,7 @@ def get_statistics(
             "average_daily_volume": average_daily_volume,
         },
         'info': {
-            'error': error_msg,
+            'error': '',
         }
     }
 
