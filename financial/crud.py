@@ -24,11 +24,11 @@ def insert_financial_data(db: Session, entries: List[schemas.Entry]):
 
 def get_financial_data(
         db: Session,
-        symbol: Union[str, None],
-        start_date: Union[date, None],
-        end_date: Union[date, None],
-        skip: int = 0,
-        limit: int = 5,
+        symbol: Union[str, None] = None,
+        start_date: Union[date, None] = None,
+        end_date: Union[date, None] = None,
+        skip: Union[int, None] = None,
+        limit: Union[int, None] = None,
     ):
     """
     This function gets financial data from financial_data table
@@ -38,8 +38,8 @@ def get_financial_data(
     - symbol (str, optional): Stock symbol to fetch data for
     - start_date (date, optional): Filter to filter out data before start_date
     - end_date (date, optional): Filter to filter out data after end_date
-    - skip (int, optional): number of rows to skip. Defaults to 0
-    - limit (int, optional): number of rows to return. Defaults to 5
+    - skip (int, optional): number of rows to skip
+    - limit (int, optional): number of rows to return
 
     Returns:
     - list of stock data entries
@@ -51,8 +51,12 @@ def get_financial_data(
         query = query.filter(models.Entry.date >= start_date)
         if end_date is not None:
             query = query.filter(models.Entry.date <= end_date)
+    if skip:
+        query.offset(skip)
+    if limit:
+        query.limit(limit)
 
-    return query.offset(skip).limit(limit).all()
+    return query.all()
 
 
 def get_financial_data_count(db: Session):

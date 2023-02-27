@@ -90,7 +90,6 @@ def get_statistics(
         average_daily_open_price, average_daily_close_price,
         and average_daily_volume
     """
-    # BUG: get_financial_data has a limit!
     try:
         data = crud.get_financial_data(db, symbol, start_date, end_date)
     except SQLAlchemyError as e:
