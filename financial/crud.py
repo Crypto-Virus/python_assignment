@@ -42,7 +42,7 @@ def get_financial_data(
     - limit (int, optional): number of rows to return
 
     Returns:
-    - list of stock data entries
+    - Tuple containing total count without pagination and data
     """
     query = db.query(models.Entry)
     if symbol is not None:
@@ -51,22 +51,14 @@ def get_financial_data(
         query = query.filter(models.Entry.date >= start_date)
         if end_date is not None:
             query = query.filter(models.Entry.date <= end_date)
+
+    count = query.count()
+
     if skip:
         query.offset(skip)
     if limit:
         query.limit(limit)
 
-    return query.all()
+    data = query.all()
 
-
-def get_financial_data_count(db: Session):
-    """
-    This function returns total count of rows in financial_data table
-
-    Args:
-    - db (Session): Sqlalcheny session object
-
-    Returns:
-    - integer representing count of rows in financial_data table
-    """
-    return db.query(models.Entry).count()
+    return (count, data)

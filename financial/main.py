@@ -1,4 +1,4 @@
-import json
+from math import ceil
 from typing import List, Union
 from datetime import date
 
@@ -48,8 +48,7 @@ def get_financial_data(
     """
     skip = (page - 1) * limit
     try:
-        count = crud.get_financial_data_count(db)
-        data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
+        count, data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=500,
@@ -62,7 +61,7 @@ def get_financial_data(
                 'count': count,
                 'page': page,
                 'limit': limit,
-                'pages': int(count / limit)
+                'pages': ceil(count / limit)
             },
             'info': {
                 'error': '',
@@ -91,7 +90,7 @@ def get_statistics(
         and average_daily_volume
     """
     try:
-        data = crud.get_financial_data(db, symbol, start_date, end_date)
+        data = crud.get_financial_data(db, symbol, start_date, end_date)[1]
     except SQLAlchemyError as e:
         raise HTTPException(
             status_code=500,
