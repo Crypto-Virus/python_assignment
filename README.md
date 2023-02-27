@@ -26,7 +26,7 @@ docker-compose up
 ```
 
 ### Task 1
-Since we are using sqlite database. The `get_raw_data.py` script must be executed from within the container shell. This is because it needs direct access to the file.
+Since we are using sqlite database. The `get_raw_data.py` script must be executed from within the container shell. This is because it needs direct access to the database file.
 
 **Note: An alternative to this is to create new API endpoint to write to database so when don't have to execute command from within container shell**
 
@@ -69,8 +69,10 @@ This solution uses the following libraries:
 ## Database choice: SQLite
 SQLite was used as database choice because it is simple and easy to use for projects and doesn't require starting and running another service. However, in production, I would suggest using another database such as PostgreSQL.
 
+`financial.db` is the database file.
+
 ## Storing and Managing API key
-Environment variable is used to store API key instead of hardcoding it into code. This makes it easier to manage and update the keys without modifying the code. You can set the environment variables in the deployment environment, and the code can read them at runtime
+Environment variable is used to store API key instead of hardcoding it into code. This makes it easier to manage and update the keys without modifying the code. In development environment, you can manually export environment variables or store it in `.env` file and use `python-dotenv` module to load it. In production environment you can set the environment variable directly in the server settings.
 
 A secrets management tool can securely store and manage sensitive data, including API keys. Some popular tools are HashiCorp Vault, AWS Secrets Manager, and Google Cloud Secret Manager. These tools provide access controls, audit logs, and encryption to protect the secrets.
 
