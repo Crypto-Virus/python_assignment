@@ -52,8 +52,8 @@ def get_financial_data(
         data = crud.get_financial_data(db, symbol, start_date, end_date, skip, limit)
     except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=404,
-            detail=f'Failed to get data from database. Error [{e}]',
+            status_code=500,
+            detail=f'Failed to read data from database. Error [{e}]',
         )
     else:
         return {
@@ -94,12 +94,20 @@ def get_statistics(
         data = crud.get_financial_data(db, symbol, start_date, end_date)
     except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=404,
-            detail=f'Failed to get data from database. Error [{e}]',
+            status_code=500,
+            detail=f'Failed to read data from database. Error [{e}]',
         )
+    if len(data) == 0:
+        return {
+            'data': {},
+            'info': {
+                'error': 'No entries exist in database for specified symbol or dates'
+            }
+        }
     average_daily_open_price = sum([entry.open_price for entry in data]) / len(data)
     average_daily_close_price = sum([entry.close_price for entry in data]) / len(data)
     average_daily_volume = sum([entry.volume for entry in data]) / len(data)
+    print('b')
     return {
         'data': {
             "start_date": start_date,
